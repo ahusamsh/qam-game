@@ -1,6 +1,6 @@
 const CACHE = 'qam-v1';
 const FILES = [
-  'game.html',
+  'index.html',
   'book_data.json',
   'icons/site.webmanifest'
 ];
