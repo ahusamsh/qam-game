@@ -196,7 +196,7 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
 .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px;margin:4px 0}
 .menu-card{background:var(--card-bg);border-radius:var(--radius-sm);padding:16px 12px;text-align:center;cursor:pointer;transition:all .12s;box-shadow:var(--box-shadow-sm);border:1px solid var(--border-color)}
 .menu-card:active{transform:scale(.95);border-color:var(--primary)}
-.menu-card .micon{font-size:2.2rem;margin-bottom:4px}
+.menu-card .micon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--primary);color:#fff;font-size:1.2rem;font-weight:800;margin-bottom:6px;box-shadow:0 3px 8px rgba(var(--primary-rgb),.25)}
 .menu-card .mname{font-family:var(--font);font-size:.85rem;font-weight:700;color:var(--heading-color)}
 .menu-card .mdesc{font-size:.65rem;color:var(--gray-400);margin-top:1px}
 .menu-card .mbadges{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:5px}
@@ -240,7 +240,7 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
 @media(max-width:420px){
   .menu-grid{gap:8px}
   .menu-card{padding:12px 8px}
-  .menu-card .micon{font-size:1.8rem}
+  .menu-card .micon{width:38px;height:38px;font-size:1rem}
   .menu-card .mname{font-size:.78rem}
   .word-box.big{font-size:3.2rem;min-height:130px}
   .word-box.med{font-size:2rem;min-height:75px}
@@ -286,8 +286,8 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
       <div><div class="logo-text">القاعدة المدنية</div><div class="logo-sub">تعليم القراءة باللمس والصوت</div></div>
     </div>
     <div class="idea-tabs">
-      <button class="idea-tab active" id="ideaTab1" onclick="showIdea(1)">🎮 فكرة 1: ألعاب</button>
-      <button class="idea-tab" id="ideaTab2" onclick="showIdea(2)">🦉 فكرة 2: دوالينجو</button>
+      <button class="idea-tab active" id="ideaTab1" onclick="showIdea(1)">فكرة 1: ألعاب</button>
+      <button class="idea-tab" id="ideaTab2" onclick="showIdea(2)">فكرة 2: دوالينجو</button>
     </div>
     <div class="theory-row" id="theoryRow">
       <span class="badge badge-primary">مونتيسوري</span>
@@ -439,20 +439,20 @@ document.head.insertAdjacentHTML('beforeend','<style>@keyframes shower{0%{transf
 
 // ===== MENU =====
 const GAMES = [
-  {id:'learn',i:'📖',n:'التعلم بالتدرج',d:'مسار الكتاب الكامل',b:[{t:'primary',l:'ZPD'},{t:'gold',l:'سلوكي'}]},
-  {id:'trace',i:'👆',n:'الحروف الحسية',d:'مونتيسوري - اللمس',b:[{t:'primary',l:'مونتيسوري'}]},
-  {id:'vakt',i:'🖐️',n:'4 خطوات VAKT',d:'أورتن-جيلنجهام',b:[{t:'success',l:'VAKT'}]},
-  {id:'sound',i:'🔊',n:'الوعي الصوتي',d:'الصوت والمقاطع',b:[{t:'warning',l:'وعي صوتي'}]},
-  {id:'zpd',i:'📈',n:'السلم الذكي ZPD',d:'مستويات متكيفة',b:[{t:'info',l:'ZPD'}]},
-  {id:'mastery',i:'🎓',n:'الإتقان التام',d:'بلوم - 80% للانتقال',b:[{t:'danger',l:'إتقان Bloom'}]},
-  {id:'review',i:'🔄',n:'المراجعة الذكية',d:'إبنجهاوس - استرجاع متباعد',b:[{t:'primary',l:'استرجاع Ebbinghaus'}]},
-  {id:'dual',i:'🖼️',n:'الحرف والصورة',d:'بيفيو - التشفير المزدوج',b:[{t:'success',l:'تشفير Paivio'}]},
-  {id:'tpr',i:'🙆',n:'الاستجابة الحركية',d:'آشر - تعلم بالحركة',b:[{t:'warning',l:'حركي Asher'}]},
-  {id:'quiz',i:'🎯',n:'اختر الحرف',d:'بياجيه + تعزيز',b:[{t:'green',l:'بياجيه'},{t:'gold',l:'سلوكي'}]},
-  {id:'shapes',i:'🧩',n:'أشكال الحروف',d:'مونتيسوري',b:[{t:'primary',l:'مونتيسوري'}]},
-  {id:'memory',i:'🧠',n:'الذاكرة',d:'بياجيه',b:[{t:'green',l:'بياجيه'}]},
-  {id:'browse',i:'📄',n:'تصفح الكتاب',d:'صفحات + باركود',b:[{t:'gold',l:'قراءة كلية'}]},
-  {id:'duolingo',i:'🦉',n:'دوالينجو العربية',d:'XP + قلوب + تدرج',b:[{t:'primary',l:'دوالينجو'},{t:'gold',l:'XP'}]}
+  {id:'learn',i:'ت',n:'التعلم بالتدرج',d:'مسار الكتاب الكامل',b:[{t:'primary',l:'ZPD'},{t:'gold',l:'سلوكي'}]},
+  {id:'trace',i:'ل',n:'الحروف الحسية',d:'مونتيسوري - اللمس',b:[{t:'primary',l:'مونتيسوري'}]},
+  {id:'vakt',i:'خ',n:'4 خطوات VAKT',d:'أورتن-جيلنجهام',b:[{t:'success',l:'VAKT'}]},
+  {id:'sound',i:'ص',n:'الوعي الصوتي',d:'الصوت والمقاطع',b:[{t:'warning',l:'وعي صوتي'}]},
+  {id:'zpd',i:'س',n:'السلم الذكي ZPD',d:'مستويات متكيفة',b:[{t:'info',l:'ZPD'}]},
+  {id:'mastery',i:'إ',n:'الإتقان التام',d:'بلوم - 80% للانتقال',b:[{t:'danger',l:'إتقان Bloom'}]},
+  {id:'review',i:'م',n:'المراجعة الذكية',d:'إبنجهاوس - استرجاع متباعد',b:[{t:'primary',l:'استرجاع Ebbinghaus'}]},
+  {id:'dual',i:'ص',n:'الحرف والصورة',d:'بيفيو - التشفير المزدوج',b:[{t:'success',l:'تشفير Paivio'}]},
+  {id:'tpr',i:'ح',n:'الاستجابة الحركية',d:'آشر - تعلم بالحركة',b:[{t:'warning',l:'حركي Asher'}]},
+  {id:'quiz',i:'اخ',n:'اختر الحرف',d:'بياجيه + تعزيز',b:[{t:'green',l:'بياجيه'},{t:'gold',l:'سلوكي'}]},
+  {id:'shapes',i:'ش',n:'أشكال الحروف',d:'مونتيسوري',b:[{t:'primary',l:'مونتيسوري'}]},
+  {id:'memory',i:'ذ',n:'الذاكرة',d:'بياجيه',b:[{t:'green',l:'بياجيه'}]},
+  {id:'browse',i:'ص',n:'تصفح الكتاب',d:'صفحات + باركود',b:[{t:'gold',l:'قراءة كلية'}]},
+  {id:'duolingo',i:'د',n:'دوالينجو العربية',d:'XP + قلوب + تدرج',b:[{t:'primary',l:'دوالينجو'},{t:'gold',l:'XP'}]}
 ];
 
 function renderMenu(){
@@ -908,8 +908,8 @@ async function loadData(){
 loadData();
 
 // ===== DUOLINGO-STYLE GAME (from book_data) =====
-const BAB_ICONS = ['🔤','⬛','🔴','〰️','➖','📖','🔗','➕','🔺','🌙','📝','🔍','🔢','🏁'];
 const BAB_COLORS = ['#7367f0','#28c76f','#ff9f43','#ff4c51','#00bad1','#c7a76c','#3c6f5e','#a855f7','#ec4899','#f97316','#14b8a6','#06b6d4','#eab308','#84cc16'];
+function babNum(n){const ns=['١','٢','٣','٤','٥','٦','٧','٨','٩','١٠','١١','١٢','١٣','١٤'];return ns[n]||n+1}
 
 function buildDuoUnits(){
   const units=[];
@@ -929,7 +929,7 @@ function buildDuoUnits(){
     });
     if(lessons.length){
       const nm=hdr?hdr.segment.replace(/\n/g,' ').trim().substring(0,35):`الباب ${bNum}`;
-      units.push({id:'bab_'+bNum,name:nm,icon:BAB_ICONS[i%BAB_ICONS.length],color:BAB_COLORS[i%BAB_COLORS.length],lessons,bab:bNum});
+      units.push({id:'bab_'+bNum,name:nm,color:BAB_COLORS[i%BAB_COLORS.length],lessons,bab:bNum});
     }
   });
   return units;
@@ -986,7 +986,7 @@ function duolingoGame(){
       const pct=u.lessons.length?done/u.lessons.length*100:0;
       h+=`<div class="card" style="padding:8px 10px;margin:3px 0;border-right:3px solid ${u.color};opacity:${locked?.35:1};cursor:${locked?'not-allowed':'pointer'}" onclick="${locked?'':`duoShowLessons('${u.id}')`}">
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:1.3rem">${u.icon}</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:${u.color}15;color:${u.color};font-size:.8rem;font-weight:800">${babNum(i)}</span>
           <div style="flex:1;overflow:hidden"><div style="font-weight:700;font-size:.8rem;color:var(--heading-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div>
           <div style="font-size:.6rem;color:var(--gray-400)">${done}/${u.lessons.length} دروس</div></div>
           <div class="progress-wrap" style="width:40px"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div></div>
@@ -1004,9 +1004,11 @@ function duolingoGame(){
     if(!u)return;
     const d=loadD();
     const done=unitProgress(d,uid);
+    const ui=DUO_UNITS.indexOf(u);
     let h=`<div class="w-full" style="max-width:420px"><div style="display:flex;align-items:center;gap:6px;padding:4px 0">
       <button class="btn btn-sm btn-ghost" onclick="showUnitSelect()" style="font-size:.8rem">←</button>
-      <span style="font-size:.85rem;font-weight:700;color:var(--heading-color)">${u.icon} ${u.name}</span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:${u.color}15;color:${u.color};font-size:.8rem;font-weight:800;margin-left:4px">${babNum(ui)}</span>
+      <span style="font-size:.85rem;font-weight:700;color:var(--heading-color)">${u.name}</span>
     </div>`;
     u.lessons.forEach((ls,i)=>{
       const completed=i<done;
@@ -1060,7 +1062,7 @@ function duolingoGame(){
       const b=body();
       b.innerHTML=`<div class="w-full" style="max-width:420px"><div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
         <div>${Array(Math.min(lessonHearts,5)).fill().map(()=>'<span style="color:var(--danger);font-size:1.1rem">❤️</span>').join('')}${lessonHearts<5?Array(5-Math.min(lessonHearts,5)).fill().map(()=>'<span style="color:var(--gray-300);font-size:1.1rem">❤️</span>').join(''):''}</div>
-        <div style="font-size:.7rem;color:var(--gray-500)">${u.icon} ${lIdx+1}/${u.lessons.length}</div>
+        <div style="font-size:.7rem;color:var(--gray-500)">${lIdx+1}/${u.lessons.length}</div>
       </div>
       <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width:${(qIdx/qCount)*100}%"></div></div></div>
       ${q.html}
