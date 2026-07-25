@@ -277,7 +277,24 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
 .journey-connector{width:12px;height:2px;background:var(--border-color);flex-shrink:0;margin:0 -1px;position:relative;z-index:1}
 .journey-connector.done{background:var(--primary);height:3px}
 @keyframes nodePulse{0%,100%{box-shadow:0 0 0 0 rgba(115,103,240,.3)}50%{box-shadow:0 0 0 8px rgba(115,103,240,0)}}
-/* ===== 29. A11Y ===== */
+/* ===== 29. PROGRESS TREE ===== */
+.progress-tree-wrap{display:flex;flex-direction:column;align-items:center;margin:2px 0;width:100%;position:relative}
+.progress-tree-canopy{position:relative;width:80px;height:48px;display:flex;align-items:flex-end;justify-content:center}
+.progress-tree-leaf{position:absolute;width:8px;height:8px;border-radius:50%;transition:all .4s ease;animation:leafPop .3s ease-out}
+@keyframes leafPop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.progress-tree-canopy-bg{width:64px;height:38px;border-radius:50% 50% 45% 45%;background:var(--gray-50);position:relative;overflow:hidden;border:1px solid var(--border-color)}
+.progress-tree-trunk{width:12px;height:22px;background:linear-gradient(180deg,#a0825a,#8a6e48);border-radius:3px 3px 2px 2px;margin-top:-2px;z-index:2;position:relative}
+.progress-tree-pot{width:36px;height:8px;background:var(--gray-200);border-radius:2px 2px 5px 5px;margin-top:-1px}
+.progress-tree-label{font-size:.5rem;color:var(--gray-400);margin-top:1px}
+/* ===== 30. ACHIEVEMENT GALLERY ===== */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;width:100%;padding:4px 0}
+.ach-item{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:var(--radius-xs);background:var(--gray-50);text-align:center;transition:all .15s}
+.ach-item.unlocked{background:var(--primary)08}
+.ach-icon{font-size:1.8rem;margin-bottom:2px}
+.ach-name{font-size:.55rem;color:var(--gray-600);line-height:1.2}
+.ach-item.locked .ach-icon{filter:grayscale(1);opacity:.3}
+.ach-item.locked .ach-name{color:var(--gray-400)}
+/* ===== 31. A11Y ===== */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 </style>
 </head>
@@ -306,10 +323,17 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
       <button class="idea-tab" id="ideaTab2" onclick="showIdea(2)">فكرة 2: دوالينجو</button>
       <button class="idea-tab" id="ideaTab3" onclick="showIdea(3)">فكرة 3: الرحلة</button>
     </div>
-    <div id="motivationRow" style="display:flex;align-items:center;gap:6px;justify-content:center;margin:2px 0;width:100%;max-width:340px">
-      <div id="levelBadge" style="display:flex;align-items:center;gap:3px;background:var(--primary)10;padding:4px 10px;border-radius:var(--radius-xs);font-size:.7rem;color:var(--primary);font-weight:700">🌟 مستوى 1</div>
-      <div id="motivStars" style="display:flex;gap:2px;font-size:.85rem"></div>
-      <div id="xpDisplay" style="background:var(--gold)15;padding:4px 8px;border-radius:var(--radius-xs);font-size:.65rem;color:var(--gold);font-weight:700">0 XP</div>
+    <div class="progress-tree-wrap" id="progressTree">
+      <div class="progress-tree-canopy">
+        <div class="progress-tree-canopy-bg" id="treeCanopyBg"></div>
+      </div>
+      <div class="progress-tree-trunk"></div>
+      <div class="progress-tree-pot"></div>
+      <div class="progress-tree-label" id="treeLabel">🌱 ابدأ رحلتك</div>
+    </div>
+    <div id="motivationRow" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:1px 0;width:100%;max-width:300px">
+      <div id="levelBadge" style="display:flex;align-items:center;gap:2px;background:var(--primary)10;padding:3px 8px;border-radius:var(--radius-xs);font-size:.65rem;color:var(--primary);font-weight:700">🌟 مستوى 1</div>
+      <button class="btn btn-sm btn-ghost" onclick="launch('achievements')" style="font-size:.6rem;padding:3px 6px;color:var(--gold)">🏅 الإنجازات</button>
     </div>
     <div class="menu-grid" id="menuGrid"></div>
     <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center">
@@ -462,7 +486,8 @@ function sparkle(){
 function playSound(type){
   try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();gain.connect(ctx.destination);osc.connect(gain);gain.gain.value=.1;if(type==='correct'){osc.frequency.value=660;osc.type='sine';gain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.15);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+.15);setTimeout(()=>{const o2=ctx.createOscillator();const g2=ctx.createGain();g2.connect(ctx.destination);o2.connect(g2);g2.gain.value=.08;o2.frequency.value=880;o2.type='sine';g2.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.12);o2.start(ctx.currentTime);o2.stop(ctx.currentTime+.12)},100)}else{osc.frequency.value=330;osc.type='sawtooth';gain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+.2)}}catch(e){}}
 function playLevelUp(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const notes=[523,659,784,1047];notes.forEach((f,i)=>{setTimeout(()=>{const o=ctx.createOscillator();const g=ctx.createGain();g.connect(ctx.destination);o.connect(g);g.gain.value=.08;o.frequency.value=f;o.type='sine';g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);o.start(ctx.currentTime);o.stop(ctx.currentTime+.2)},i*120)})}catch(e){}}
-
+function vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
+function autoPlay(t,delay=500){setTimeout(()=>{if(!document.getElementById('gameScreen').classList.contains('active'))return;say(t)},delay)}
 document.head.insertAdjacentHTML('beforeend','<style>@keyframes shower{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}</style>');
 
 // ===== MENU =====
@@ -480,22 +505,22 @@ const GAMES = [
   {id:'shapes',i:'ش',n:'أشكال الحروف',d:'أول ووسط وآخر الكلمة'},
   {id:'memory',i:'ذ',n:'الذاكرة',d:'تذكر الأزواج'},
   {id:'browse',i:'ص',n:'تصفح الكتاب',d:'الصفحات والباركود'},
-  {id:'duolingo',i:'د',n:'دوالينجو العربية',d:'XP وقلوب وتدرج'}
+  {id:'duolingo',i:'د',n:'دوالينجو العربية',d:'XP وقلوب وتدرج'},
+  {id:'achievements',i:'ج',n:'الإنجازات',d:'الجوائز التي حصلت عليها'}
 ];
 
 function renderMenu(){
   const g=document.getElementById('menuGrid');
   g.innerHTML='';
   const ts=totStars();
-  const xp=ts*5;
   const lv=Math.floor(ts/5)+1;
-  const nextLv=lv*5;
-  const lvProgress=((ts%5)/5)*100;
   document.getElementById('levelBadge').innerHTML=`🌟 مستوى ${lv}`;
-  document.getElementById('xpDisplay').textContent=xp+' XP';
-  const starEl=document.getElementById('motivStars');
-  starEl.innerHTML='';
-  for(let i=0;i<5;i++){const s=document.createElement('span');s.textContent=i<ts%5?'⭐':'☆';s.style.color=i<ts%5?'var(--gold)':'var(--gray-300)';starEl.appendChild(s)}
+  // Progress tree
+  const treeBg=document.getElementById('treeCanopyBg');const label=document.getElementById('treeLabel');
+  treeBg.innerHTML='';const leafCnt=Math.min(ts,20);const colors=['#28c76f','#00bad1','#ff9f43','#7367f0','#c7a76c','#ff4c51','#3c6f5e'];
+  for(let i=0;i<leafCnt;i++){const l=document.createElement('div');l.className='progress-tree-leaf';const angle=Math.random()*Math.PI*2;const r=10+Math.random()*18;l.style.cssText=`bottom:${4+Math.random()*20}px;left:${32+Math.sin(angle)*r}px;background:${colors[i%colors.length]};animation-delay:${Math.random()*.3}s`;treeBg.appendChild(l)}
+  const stages=['🌱 ابدأ رحلتك','🌿 بداية جيدة','🌳 شجرة المعرفة','🌸 شجرة مزهرة','🌳 مثمرة','🏆 متقن'];
+  const stageIdx=Math.min(Math.floor(leafCnt/4),stages.length-1);label.textContent=stages[stageIdx];
   GAMES.forEach(gm=>{
     const c=document.createElement('div');
     c.className='menu-card';
@@ -517,7 +542,7 @@ function launch(id){stopTTS();show('gameScreen');switch(id){
   case'sound':soundGame();break;case'zpd':zpdGame();break;case'quiz':quizGame();break;
   case'mastery':masteryGame();break;case'review':reviewGame();break;case'dual':dualCoding();break;
   case'tpr':tprGame();break;case'shapes':shapesGame();break;case'memory':memoryGame();break;
-  case'duolingo':duolingoGame();break;case'journey':journeyGame();break;case'browse':browseBook();break;default:exitGame();
+  case'duolingo':duolingoGame();break;case'journey':journeyGame();break;case'achievements':achievementGallery();break;case'browse':browseBook();break;default:exitGame();
 }}
 
 function setH(title,badges){document.getElementById('gameTitle').textContent=title;document.getElementById('gameBadges').innerHTML=badges||''}
@@ -1109,8 +1134,8 @@ function duolingoGame(){
         const chosen=btn.getAttribute('data-val');const correct=q.answer;
         const rd=document.getElementById('duoResult');
         b.querySelectorAll('.duo-btn').forEach(b2=>b2.disabled=true);
-        if(chosen===correct){correctCount++;combo++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅ ${combo>1?'🔥 x'+combo:''}</span>`;say(correct)}
-        else{combo=0;lessonHearts--;btn.classList.add('wrong');b.querySelectorAll('.duo-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌</span>`}
+        if(chosen===correct){correctCount++;combo++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅ ${combo>1?'🔥 x'+combo:''}</span>`;say(correct);vibrate(30)}
+        else{combo=0;lessonHearts--;btn.classList.add('wrong');b.querySelectorAll('.duo-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌</span>`;vibrate(60)}
         animating=false;setTimeout(renderQ,800);
       }});
     }
@@ -1121,6 +1146,31 @@ function duolingoGame(){
   showUnitSelect();
 }
 
+// ===== ACHIEVEMENT GALLERY =====
+const ALL_ACHIEVEMENTS=[
+  {id:'first_star',icon:'⭐',name:'أول نجمة'},
+  {id:'ten_stars',icon:'🌟',name:'10 نجوم'},
+  {id:'stars_25',icon:'💫',name:'25 نجمة'},
+  {id:'stars_50',icon:'🏆',name:'50 نجمة'},
+  {id:'stars_100',icon:'👑',name:'100 نجمة'},
+  {id:'all_games',icon:'🎮',name:'جرب كل الألعاب'},
+  {id:'perfect_lesson',icon:'💎',name:'درس كامل بدون خطأ'},
+  {id:'speedster',icon:'⚡',name:'5 إجابات صحيحة متتالية'}
+];
+function achievementGallery(){
+  setH('🏅 الإنجازات','<span class="badge badge-primary">الجوائز</span>');
+  const unlocked=getAchievements();const ts=totStars();
+  // Auto-unlock some
+  if(ts>=10)addAchievement('ten_stars');if(ts>=25)addAchievement('stars_25');if(ts>=50)addAchievement('stars_50');if(ts>=100)addAchievement('stars_100');
+  if(Object.keys(stars()).length>=13)addAchievement('all_games');
+  let h=`<div class="w-full" style="max-width:380px"><p style="color:var(--gray-600);font-size:.75rem;text-align:center;margin:4px 0">${unlocked.length}/${ALL_ACHIEVEMENTS.length} مفتوحة</p><div class="ach-grid">`;
+  ALL_ACHIEVEMENTS.forEach(a=>{
+    const u=unlocked.includes(a.id);
+    h+=`<div class="ach-item ${u?'unlocked':'locked'}"><div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div></div>`;
+  });
+  h+=`</div><p style="text-align:center;color:var(--gray-400);font-size:.55rem;margin:6px 0">${ts}⭐ إجمالي</p></div>`;
+  body().innerHTML=h;
+}
 // ===== JOURNEY GAME (فكرة 3: الرحلة) =====
 function journeyGame(){
   let DUO_UNITS=buildDuoUnits();
@@ -1128,30 +1178,41 @@ function journeyGame(){
   function saveJ(d){localStorage.setItem('qm_journey',JSON.stringify(d))}
 
   // 3 question types mixed: listen, first-letter, shape-match
-  function genJourneyQ(seg,pool){
+  function getPageForSeg(segText,babNum){
+    const entry=BOOK.find(x=>x.segment.trim()===segText.trim()&&x.bab===babNum);
+    return entry&&entry.page?pdx(entry.page):null;
+  }
+  function genJourneyQ(seg,pool,babNum){
     const type=Math.random();
     const segTrim=seg.replace(/[ًٌٍَُِّْ]|ـ/g,'');
+    const pg=getPageForSeg(seg,babNum);
+    const pageImg=pg&&pg>=1?`<img src="pages/page_${String(pg).padStart(2,'0')}.png" style="width:100%;max-width:200px;border-radius:var(--radius-xs);margin:4px auto;display:block;opacity:.3;position:absolute;top:0;left:50%;transform:translateX(-50%);pointer-events:none" onerror="this.style.display='none'">`:'';
+
     if(type<.33&&segTrim.length>1){
       const first=segTrim[0];
       if(first&&HIJAI.includes(first)){
         const opts=shuffle(HIJAI.filter(x=>x!==first)).slice(0,2);
         const all=shuffle([first,...opts]);
         const display=seg.length>18?seg.substring(0,18)+'...':seg;
-        return {html:`<div style="font-size:1.4rem;margin:4px 0;font-family:'uthmanic',system-ui;color:var(--heading-color)">${display}</div>
-          <button class="btn btn-sm btn-primary" onclick="say('${seg.replace(/'/g,"\\'")}')" style="margin:4px 0">🔊</button>
-          <p style="color:var(--gray-500);font-size:.75rem;margin:6px 0">أوّل حرف؟</p>
-          <div class="opt-grid opt-3" style="max-width:200px;margin:6px auto">${all.map(o=>`<button class="opt-btn jny-btn" data-val="${o}">${o}</button>`).join('')}</div>`, answer:first};
+        const html=`<div style="position:relative;min-height:60px;display:flex;flex-direction:column;align-items:center">${pageImg}
+          <div style="font-size:1.4rem;margin:4px 0;font-family:'uthmanic',system-ui;color:var(--heading-color);position:relative;z-index:1">${display}</div>
+          <p style="color:var(--gray-500);font-size:.75rem;margin:6px 0;position:relative;z-index:1">أوّل حرف؟</p>
+          <div class="opt-grid opt-3" style="max-width:200px;margin:6px auto;position:relative;z-index:1">${all.map(o=>`<button class="opt-btn jny-btn" data-val="${o}">${o}</button>`).join('')}</div></div>`;
+        autoPlay(seg,400);
+        return {html, answer:first};
       }
     }
     if(type<.66&&segTrim.length===1){
       const img=LETTER_IMAGES[segTrim]||'';
       const opts=shuffle(HIJAI.filter(x=>x!==segTrim)).slice(0,2);
       const all=shuffle([segTrim,...opts]);
+      const html=`<div style="position:relative;min-height:60px;display:flex;flex-direction:column;align-items:center">${pageImg}
+        ${img?`<div style="font-size:3rem;margin:4px 0;position:relative;z-index:1">${img}</div>`:''}
+        <div style="font-size:4rem;margin:4px 0;font-family:'uthmanic',system-ui;color:var(--heading-color);position:relative;z-index:1">${segTrim}</div>
+        <p style="color:var(--gray-500);font-size:.75rem;margin:6px 0;position:relative;z-index:1">أي حرف؟</p>
+        <div class="opt-grid opt-3" style="max-width:200px;margin:6px auto;position:relative;z-index:1">${all.map(o=>`<button class="opt-btn jny-btn" data-val="${o}">${o}</button>`).join('')}</div></div>`;
       setTimeout(()=>say(segTrim),300);
-      return {html:`${img?`<div style="font-size:3rem;margin:4px 0">${img}</div>`:''}
-        <div style="font-size:4rem;margin:4px 0;font-family:'uthmanic',system-ui;color:var(--heading-color)">${segTrim}</div>
-        <p style="color:var(--gray-500);font-size:.75rem;margin:6px 0">أي حرف؟</p>
-        <div class="opt-grid opt-3" style="max-width:200px;margin:6px auto">${all.map(o=>`<button class="opt-btn jny-btn" data-val="${o}">${o}</button>`).join('')}</div>`, answer:segTrim};
+      return {html, answer:segTrim};
     }
     // Default: listen and choose
     const dist=shuffle(pool.filter(s=>s!==seg)).slice(0,2);
@@ -1159,10 +1220,11 @@ function journeyGame(){
     const opts=shuffle([seg,...dist]);
     const display=seg.length>20?seg.substring(0,20)+'...':seg;
     const short=seg.trim().length<=3;
-    setTimeout(()=>say(seg.replace(/'/g,"\\'")),400);
-    return {html:`<p style="color:var(--gray-500);font-size:.75rem;margin:4px 0">👂 استمع:</p>
-      <div style="font-size:${short?'3.5rem':'1.8rem'};margin:6px 0;font-family:'uthmanic',system-ui;color:var(--heading-color)">${display}</div>
-      <div class="opt-grid opt-2" style="max-width:240px;margin:6px auto">${opts.map(o=>`<button class="opt-btn jny-btn" data-val="${o.replace(/'/g,"\\'")}">${o.length>10?o.substring(0,10)+'...':o}</button>`).join('')}</div>`, answer:seg};
+    const html=`<div style="position:relative;min-height:60px;display:flex;flex-direction:column;align-items:center">${pageImg}
+      <div style="font-size:${short?'3.5rem':'1.8rem'};margin:6px 0;font-family:'uthmanic',system-ui;color:var(--heading-color);position:relative;z-index:1">${display}</div>
+      <div class="opt-grid opt-2" style="max-width:240px;margin:6px auto;position:relative;z-index:1">${opts.map(o=>`<button class="opt-btn jny-btn" data-val="${o.replace(/'/g,"\\'")}">${o.length>10?o.substring(0,10)+'...':o}</button>`).join('')}</div></div>`;
+    autoPlay(seg,500);
+    return {html, answer:seg};
   }
 
   function showPath(){
@@ -1224,7 +1286,7 @@ function journeyGame(){
     if(!pool.length){celebrate('⭐','لا توجد مقاطع','');return}
     const qCount=Math.min(5,pool.length);
     let qIdx=0,correctCount=0;
-    const questions=pool.slice(0,qCount).map(seg=>genJourneyQ(seg,pool));
+    const questions=pool.slice(0,qCount).map(seg=>genJourneyQ(seg,pool,u.bab));
 
     function render(){
       if(qIdx>=qCount){
@@ -1256,8 +1318,8 @@ function journeyGame(){
           const chosen=btn.getAttribute('data-val');const correct=q.answer;
           const rd=document.getElementById('jnyRes');
           b.querySelectorAll('.jny-btn').forEach(b2=>b2.disabled=true);
-          if(chosen===correct){correctCount++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅ أحسنت</span>`;say(correct);playSound('correct')}
-          else{btn.classList.add('wrong');b.querySelectorAll('.jny-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌ حاول مرة أخرى</span>`;playSound('wrong')}
+          if(chosen===correct){correctCount++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅ أحسنت</span>`;say(correct);playSound('correct');vibrate(30)}
+          else{btn.classList.add('wrong');b.querySelectorAll('.jny-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌ حاول مرة أخرى</span>`;playSound('wrong');vibrate(60)}
           setTimeout(render,800);
         };
       });
