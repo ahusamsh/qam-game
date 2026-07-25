@@ -306,19 +306,11 @@ body{font-family:var(--font);background:var(--body-bg);color:var(--body-color);m
       <button class="idea-tab" id="ideaTab2" onclick="showIdea(2)">فكرة 2: دوالينجو</button>
       <button class="idea-tab" id="ideaTab3" onclick="showIdea(3)">فكرة 3: الرحلة</button>
     </div>
-    <div class="theory-row" id="theoryRow">
-      <span class="badge badge-primary">مونتيسوري</span>
-      <span class="badge badge-success">أورتن-جيلنجهام VAKT</span>
-      <span class="badge badge-warning">الوعي الصوتي</span>
-      <span class="badge badge-info">ZPD فيجوتسكي</span>
-      <span class="badge badge-gold">التعزيز السلوكي</span>
-      <span class="badge badge-green">بياجيه</span>
-      <span class="badge badge-danger">الإتقان Bloom</span>
-      <span class="badge badge-primary">الاسترجاع Ebbinghaus</span>
-      <span class="badge badge-success">التشفير المزدوج Paivio</span>
-      <span class="badge badge-warning">الاستجابة الحركية Asher</span>
+    <div id="motivationRow" style="display:flex;align-items:center;gap:6px;justify-content:center;margin:2px 0;width:100%;max-width:340px">
+      <div id="levelBadge" style="display:flex;align-items:center;gap:3px;background:var(--primary)10;padding:4px 10px;border-radius:var(--radius-xs);font-size:.7rem;color:var(--primary);font-weight:700">🌟 مستوى 1</div>
+      <div id="motivStars" style="display:flex;gap:2px;font-size:.85rem"></div>
+      <div id="xpDisplay" style="background:var(--gold)15;padding:4px 8px;border-radius:var(--radius-xs);font-size:.65rem;color:var(--gold);font-weight:700">0 XP</div>
     </div>
-    <div id="starDisplay" style="color:var(--gray-500);font-size:.8rem;margin:2px 0"></div>
     <div class="menu-grid" id="menuGrid"></div>
     <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center">
       <button class="btn btn-sm btn-ghost" onclick="toggleTheme()" id="themeToggleBtn" style="font-size:.75rem">🌙</button>
@@ -435,52 +427,79 @@ function show(id){document.querySelectorAll('.screen').forEach(e=>e.classList.re
 function exitGame(){stopTTS();show('menuScreen')}
 
 // ===== CELEBRATION =====
+function addAchievement(a){
+  let ach=[];try{ach=JSON.parse(localStorage.getItem('qm_ach')||'[]')}catch(e){}
+  if(!ach.includes(a)){ach.push(a);localStorage.setItem('qm_ach',JSON.stringify(ach));return true}
+  return false
+}
+function getAchievements(){try{return JSON.parse(localStorage.getItem('qm_ach')||'[]')}catch(e){return[]}}
 function celebrate(stars,title,text){
   document.getElementById('celebrateStars').textContent=stars;
   document.getElementById('celebrateTitle').textContent=title;
   document.getElementById('celebrateText').textContent=text;
   document.getElementById('celebrateOverlay').classList.add('show');
+  playSound('correct');
   sparkle();
+  const ts=totStars();
+  if(ts>0&&ts%5===0){playLevelUp();setTimeout(()=>{document.getElementById('celebrateTitle').textContent='🌟 مستوى جديد!';document.getElementById('celebrateText').textContent='وصلت لمستوى '+Math.floor(ts/5)+'!';sparkle()},600)}
+  // Achievement check
+  if(addAchievement('first_star')&&ts>=1)setTimeout(()=>{document.getElementById('celebrateText').textContent+=' 🏅 أول نجمة!'},300);
+  if(ts>=10&&addAchievement('ten_stars'))setTimeout(()=>{document.getElementById('celebrateText').textContent+=' 🏅 10 نجوم!'},500);
+  if(ts>=25&&addAchievement('stars_25'))setTimeout(()=>{document.getElementById('celebrateText').textContent+=' 🏅 25 نجمة!'},700);
+  renderMenu();
 }
 function closeCelebration(){document.getElementById('celebrateOverlay').classList.remove('show')}
 function sparkle(){
-  const colors=['#7367f0','#28c76f','#ff9f43','#ff4c51','#00bad1','#c7a76c','#3c6f5e'];
-  for(let i=0;i<30;i++){
+  const shapes=['●','■','▲','★','✦'];const colors=['#7367f0','#28c76f','#ff9f43','#ff4c51','#00bad1','#c7a76c','#3c6f5e','#a855f7'];
+  for(let i=0;i<40;i++){
     const e=document.createElement('div');
-    e.style.cssText=`position:fixed;pointer-events:none;z-index:999;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;border-radius:50%;left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};animation:shower ${.7+Math.random()*.5}s ease forwards;animation-delay:${Math.random()*.3}s`;
+    e.textContent=shapes[i%shapes.length];
+    e.style.cssText=`position:fixed;pointer-events:none;z-index:999;font-size:${6+Math.random()*14}px;left:${Math.random()*100}vw;top:-20px;color:${colors[i%colors.length]};animation:shower ${.5+Math.random()*.6}s ease forwards;animation-delay:${Math.random()*.4}s;transform:rotate(${Math.random()*360}deg)`;
     document.body.appendChild(e);
-    setTimeout(()=>e.remove(),1500);
+    setTimeout(()=>e.remove(),1800);
   }
 }
+function playSound(type){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();gain.connect(ctx.destination);osc.connect(gain);gain.gain.value=.1;if(type==='correct'){osc.frequency.value=660;osc.type='sine';gain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.15);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+.15);setTimeout(()=>{const o2=ctx.createOscillator();const g2=ctx.createGain();g2.connect(ctx.destination);o2.connect(g2);g2.gain.value=.08;o2.frequency.value=880;o2.type='sine';g2.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.12);o2.start(ctx.currentTime);o2.stop(ctx.currentTime+.12)},100)}else{osc.frequency.value=330;osc.type='sawtooth';gain.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+.2)}}catch(e){}}
+function playLevelUp(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const notes=[523,659,784,1047];notes.forEach((f,i)=>{setTimeout(()=>{const o=ctx.createOscillator();const g=ctx.createGain();g.connect(ctx.destination);o.connect(g);g.gain.value=.08;o.frequency.value=f;o.type='sine';g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);o.start(ctx.currentTime);o.stop(ctx.currentTime+.2)},i*120)})}catch(e){}}
+
 document.head.insertAdjacentHTML('beforeend','<style>@keyframes shower{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}</style>');
 
 // ===== MENU =====
 const GAMES = [
-  {id:'learn',i:'ت',n:'التعلم بالتدرج',d:'مسار الكتاب الكامل',b:[{t:'primary',l:'ZPD'},{t:'gold',l:'سلوكي'}]},
-  {id:'trace',i:'ل',n:'الحروف الحسية',d:'مونتيسوري - اللمس',b:[{t:'primary',l:'مونتيسوري'}]},
-  {id:'vakt',i:'خ',n:'4 خطوات VAKT',d:'أورتن-جيلنجهام',b:[{t:'success',l:'VAKT'}]},
-  {id:'sound',i:'ص',n:'الوعي الصوتي',d:'الصوت والمقاطع',b:[{t:'warning',l:'وعي صوتي'}]},
-  {id:'zpd',i:'س',n:'السلم الذكي ZPD',d:'مستويات متكيفة',b:[{t:'info',l:'ZPD'}]},
-  {id:'mastery',i:'إ',n:'الإتقان التام',d:'بلوم - 80% للانتقال',b:[{t:'danger',l:'إتقان Bloom'}]},
-  {id:'review',i:'م',n:'المراجعة الذكية',d:'إبنجهاوس - استرجاع متباعد',b:[{t:'primary',l:'استرجاع Ebbinghaus'}]},
-  {id:'dual',i:'ص',n:'الحرف والصورة',d:'بيفيو - التشفير المزدوج',b:[{t:'success',l:'تشفير Paivio'}]},
-  {id:'tpr',i:'ح',n:'الاستجابة الحركية',d:'آشر - تعلم بالحركة',b:[{t:'warning',l:'حركي Asher'}]},
-  {id:'quiz',i:'اخ',n:'اختر الحرف',d:'بياجيه + تعزيز',b:[{t:'green',l:'بياجيه'},{t:'gold',l:'سلوكي'}]},
-  {id:'shapes',i:'ش',n:'أشكال الحروف',d:'مونتيسوري',b:[{t:'primary',l:'مونتيسوري'}]},
-  {id:'memory',i:'ذ',n:'الذاكرة',d:'بياجيه',b:[{t:'green',l:'بياجيه'}]},
-  {id:'browse',i:'ص',n:'تصفح الكتاب',d:'صفحات + باركود',b:[{t:'gold',l:'قراءة كلية'}]},
-  {id:'duolingo',i:'د',n:'دوالينجو العربية',d:'XP + قلوب + تدرج',b:[{t:'primary',l:'دوالينجو'},{t:'gold',l:'XP'}]}
+  {id:'learn',i:'ت',n:'التعلم بالتدرج',d:'كل الكتاب خطوة بخطوة'},
+  {id:'trace',i:'ل',n:'الحروف الحسية',d:'تتبع الحروف بإصبعك'},
+  {id:'vakt',i:'خ',n:'4 خطوات التعلم',d:'شاهد - اسمع - اقرأ - اكتب'},
+  {id:'sound',i:'ص',n:'الوعي الصوتي',d:'الصوت الأول والمقاطع'},
+  {id:'zpd',i:'س',n:'السلم الذكي',d:'تحديات حسب مستواك'},
+  {id:'mastery',i:'إ',n:'الإتقان التام',d:'80% للانتقال'},
+  {id:'review',i:'م',n:'المراجعة الذكية',d:'استرجاع متباعد'},
+  {id:'dual',i:'ص',n:'الحرف والصورة',d:'كلمات وصور'},
+  {id:'tpr',i:'ح',n:'الاستجابة الحركية',d:'تعلم بالحركة'},
+  {id:'quiz',i:'اخ',n:'اختر الحرف',d:'اختبر نفسك'},
+  {id:'shapes',i:'ش',n:'أشكال الحروف',d:'أول ووسط وآخر الكلمة'},
+  {id:'memory',i:'ذ',n:'الذاكرة',d:'تذكر الأزواج'},
+  {id:'browse',i:'ص',n:'تصفح الكتاب',d:'الصفحات والباركود'},
+  {id:'duolingo',i:'د',n:'دوالينجو العربية',d:'XP وقلوب وتدرج'}
 ];
 
 function renderMenu(){
   const g=document.getElementById('menuGrid');
   g.innerHTML='';
   const ts=totStars();
-  document.getElementById('starDisplay').textContent='⭐'.repeat(Math.min(ts,25))+(ts>25?'+':'')+(ts?' ('+ts+')':'');
+  const xp=ts*5;
+  const lv=Math.floor(ts/5)+1;
+  const nextLv=lv*5;
+  const lvProgress=((ts%5)/5)*100;
+  document.getElementById('levelBadge').innerHTML=`🌟 مستوى ${lv}`;
+  document.getElementById('xpDisplay').textContent=xp+' XP';
+  const starEl=document.getElementById('motivStars');
+  starEl.innerHTML='';
+  for(let i=0;i<5;i++){const s=document.createElement('span');s.textContent=i<ts%5?'⭐':'☆';s.style.color=i<ts%5?'var(--gold)':'var(--gray-300)';starEl.appendChild(s)}
   GAMES.forEach(gm=>{
     const c=document.createElement('div');
     c.className='menu-card';
-    c.innerHTML=`<div class="micon">${gm.i}</div><div class="mname">${gm.n}</div><div class="mdesc">${gm.d}</div><div class="mbadges">${gm.b.map(b=>`<span class="badge badge-${b.t}">${b.l}</span>`).join('')}</div>`;
+    c.innerHTML=`<div class="micon">${gm.i}</div><div class="mname">${gm.n}</div><div class="mdesc">${gm.d}</div>`;
     c.onclick=()=>launch(gm.id);
     g.appendChild(c);
   });
@@ -491,7 +510,7 @@ function showIdea(n){
   document.getElementById('ideaTab'+n).classList.add('active');
   if(n===2)launch('duolingo');
   else if(n===3)launch('journey');
-  else{exitGame();renderMenu();document.getElementById('theoryRow').style.display='flex';document.getElementById('starDisplay').style.display='block'}
+  else{exitGame();renderMenu();}
 }
 function launch(id){stopTTS();show('gameScreen');switch(id){
   case'learn':learnPath();break;case'trace':traceLetters();break;case'vakt':vaktGame();break;
@@ -1237,8 +1256,8 @@ function journeyGame(){
           const chosen=btn.getAttribute('data-val');const correct=q.answer;
           const rd=document.getElementById('jnyRes');
           b.querySelectorAll('.jny-btn').forEach(b2=>b2.disabled=true);
-          if(chosen===correct){correctCount++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅</span>`;say(correct)}
-          else{btn.classList.add('wrong');b.querySelectorAll('.jny-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌</span>`}
+          if(chosen===correct){correctCount++;btn.classList.add('correct');rd.innerHTML=`<span style="color:var(--success);font-size:1.2rem">✅ أحسنت</span>`;say(correct);playSound('correct')}
+          else{btn.classList.add('wrong');b.querySelectorAll('.jny-btn').forEach(b2=>{if(b2.getAttribute('data-val')===correct)b2.classList.add('correct')});rd.innerHTML=`<span style="color:var(--danger);font-size:1.2rem">❌ حاول مرة أخرى</span>`;playSound('wrong')}
           setTimeout(render,800);
         };
       });
